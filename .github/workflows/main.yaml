@@ -1,0 +1,13 @@
+name: Main branch CI
+
+on:
+  push:
+  schedule:
+    - cron: "0 0 * * 0"
+
+jobs:
+  lint-report:
+    uses: ./.github/workflows/lint-report.yaml
+
+  build:
+    uses: ./.github/workflows/build.yaml
