@@ -1,0 +1,22 @@
+name: Main branch CI
+
+on:
+  push:
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  lint-report:
+    uses: ./.github/workflows/lint-report.yaml
+
+  build:
+    uses: ./.github/workflows/build.yaml
+  
+  integration-tests:
+    needs: build
+    uses: ./.github/workflows/integration_tests.yaml
+
+  publish:
+    if: github.ref_name == 'main'
+    needs: integration-tests
+    uses: ./.github/workflows/publish.yaml
