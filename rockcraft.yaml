@@ -1,0 +1,44 @@
+name: cognitive-profile
+base: ubuntu:22.04
+version: "0.0.1"
+summary: Cognitive Profile
+description: |
+  A tool for neuropsychologists to visualize cognitive profiles.
+license: Apache-2.0
+platforms:
+  amd64:
+
+package-repositories:
+  - type: apt
+    components: [main]
+    priority: always
+    suites: [nodistro]
+    key-id: 6F71F525282841EEDAF851B42F59B5F99B1BE0B4
+    key-server: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+    url: https://deb.nodesource.com/node_18.x
+
+services:
+  cognitive-profile:
+    command: npm run start
+    override: replace
+    startup: enabled
+    working-dir: app
+
+parts:
+
+  cognitive-profile:
+    plugin: nil
+    source: .
+    stage-packages:
+      - nodejs
+    build-snaps:
+      - node/18/stable
+    override-build: |
+      mkdir -p ${CRAFT_PART_INSTALL}/app
+      
+      npm ci
+      npm run build
+      
+      cp -r .next ${CRAFT_PART_INSTALL}/app/
+      cp -r node_modules ${CRAFT_PART_INSTALL}/app/
+      cp package.json ${CRAFT_PART_INSTALL}/app/
