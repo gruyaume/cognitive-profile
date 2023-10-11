@@ -2,15 +2,11 @@ name: Publish to Google Artifact Registry
 
 on:
   workflow_call:
-    inputs:
-      actions-id-token-request-token:
-        description: "The token to use to authenticate with Google Cloud"
+    secrets:
+      ACTIONS_ID_TOKEN_REQUEST_TOKEN:
         required: true
-        type: string
-      actions-id-token-request-token-url:
-        description: "The URL to use to request a token to authenticate with Google Cloud"
+      ACTIONS_ID_TOKEN_REQUEST_TOKEN_URL:
         required: true
-        type: string
 
 jobs:
   publish:
@@ -29,9 +25,6 @@ jobs:
           workload_identity_provider: projects/529466170665/locations/global/workloadIdentityPools/github-ci/providers/github-ci
           service_account: github-ci@cognitive-profile.iam.gserviceaccount.com
           access_token_lifetime: 300s
-        env:
-          ACTIONS_ID_TOKEN_REQUEST_TOKEN: ${{ github.event.inputs.actions-id-token-request-token }}
-          ACTIONS_ID_TOKEN_REQUEST_TOKEN_URL: ${{ github.event.inputs.actions-id-token-request-token-url }}
 
       - name: Login to Artifact Registry
         uses: docker/login-action@v1
