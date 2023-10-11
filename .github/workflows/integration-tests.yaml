@@ -39,4 +39,4 @@ jobs:
         id: test_image
         run: |
           sleep 10  # Wait for the container to be ready
-          curl localhost:3000/ | grep 'Cognitive Profile'
+          curl localhost:3000/ | grep -i 'Mon profil cognitif'
