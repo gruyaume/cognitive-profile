@@ -2,11 +2,6 @@ name: Publish to Google Artifact Registry
 
 on:
   workflow_call:
-    secrets:
-      ACTIONS_ID_TOKEN_REQUEST_TOKEN:
-        required: true
-      ACTIONS_ID_TOKEN_REQUEST_TOKEN_URL:
-        required: true
 
 jobs:
   publish:

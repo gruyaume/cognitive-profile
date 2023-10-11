@@ -28,6 +28,4 @@ jobs:
   publish-gar:
     needs: integration-tests
     uses: ./.github/workflows/publish-gar.yaml
-    secrets:
-      ACTIONS_ID_TOKEN_REQUEST_TOKEN: ${{ secrets.ACTIONS_ID_TOKEN_REQUEST_TOKEN }}
-      ACTIONS_ID_TOKEN_REQUEST_TOKEN_URL: ${{ secrets.ACTIONS_ID_TOKEN_REQUEST_TOKEN_URL }}
+    secrets: inherit
