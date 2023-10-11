@@ -28,4 +28,3 @@ jobs:
   publish-gar:
     needs: integration-tests
     uses: ./.github/workflows/publish-gar.yaml
-    secrets: inherit
