@@ -1,6 +1,6 @@
 name: cognitive-profile
 base: ubuntu:22.04
-version: "0.0.1"
+version: "0.1.0"
 summary: Cognitive Profile
 description: |
   A tool for neuropsychologists to visualize cognitive profiles.

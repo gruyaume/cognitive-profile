@@ -14,6 +14,10 @@ jobs:
         run: |
           sudo snap install skopeo --edge --devmode
 
+      - uses: actions/download-artifact@v3
+        with:
+          name: rock
+
       - name: Import the image to Docker registry
         run: |
           image_name="$(yq '.name' rockcraft.yaml)"
