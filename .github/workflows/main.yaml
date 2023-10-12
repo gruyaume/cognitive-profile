@@ -20,11 +20,7 @@ jobs:
     needs: build-image
     uses: ./.github/workflows/integration-tests.yaml
 
-  publish-ghcr:
+  publish:
     if: github.ref_name == 'main'
-    needs: integration-tests
-    uses: ./.github/workflows/publish-ghcr.yaml
-
-  publish-gar:
     needs: integration-tests
     uses: ./.github/workflows/publish-gar.yaml
