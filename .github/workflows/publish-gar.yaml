@@ -1,0 +1,50 @@
+name: Publish to Google Artifact Registry
+
+on:
+  workflow_call:
+
+jobs:
+  publish:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    steps:
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v2
+
+      - id: auth
+        name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v0
+        with:
+          token_format: access_token
+          workload_identity_provider: projects/529466170665/locations/global/workloadIdentityPools/github-ci/providers/github-ci
+          service_account: github-ci@cognitive-profile.iam.gserviceaccount.com
+          access_token_lifetime: 300s
+
+      - name: Login to Artifact Registry
+        uses: docker/login-action@v1
+        with:
+          registry: northamerica-northeast1-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: rock
+
+      - name: Import and push to github package
+        run: |
+          image_name="$(yq '.name' rockcraft.yaml)"
+          version="$(yq '.version' rockcraft.yaml)"
+          rock_file=$(ls *.rock | tail -n 1)
+          sudo skopeo \
+            --insecure-policy \
+            copy \
+            oci-archive:"${rock_file}" \
+            docker-daemon:"northamerica-northeast1-docker.pkg.dev/cognitive-profile/containers/${image_name}:${version}"
+          docker tag northamerica-northeast1-docker.pkg.dev/cognitive-profile/containers/${image_name}:${version} northamerica-northeast1-docker.pkg.dev/cognitive-profile/containers/${image_name}:latest
+          docker push northamerica-northeast1-docker.pkg.dev/cognitive-profile/containers/${image_name}:${version}
+          docker push northamerica-northeast1-docker.pkg.dev/cognitive-profile/containers/${image_name}:latest
