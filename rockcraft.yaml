@@ -23,6 +23,8 @@ services:
     override: replace
     startup: enabled
     working-dir: app
+    environment:
+      PORT: 3000
 
 parts:
 
