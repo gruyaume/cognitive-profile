@@ -11,19 +11,19 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import DashboardIcon from "@mui/icons-material/Dashboard";
 import AddIcon from "@mui/icons-material/Add";
 import PsychologyIcon from "@mui/icons-material/Psychology";
 import ThemeRegistry from "@/components/ThemeRegistry/ThemeRegistry";
+import IconButton from "@mui/material/IconButton";
 
 export const metadata = {
-  title: "Next.js App Router + Material UI v5",
-  description: "Next.js App Router + Material UI v5",
+  title: "Mon Profil Cognitif",
+  description: "A tool for neuropsychologists to visualize cognitive profiles.",
 };
 
 const DRAWER_WIDTH = 240;
 
-const LINKS = [{ text: "Créer", href: "/", icon: AddIcon }];
+const LINKS = [{ text: "Créer", href: "/evaluation", icon: AddIcon }];
 
 export default function RootLayout({
   children,
@@ -36,10 +36,15 @@ export default function RootLayout({
         <ThemeRegistry>
           <AppBar position="fixed" sx={{ zIndex: 2000 }}>
             <Toolbar sx={{ backgroundColor: "background.paper" }}>
-              <PsychologyIcon
-                fontSize="large"
-                sx={{ color: "#444", mr: 2, transform: "translateY(-2px)" }}
-              />
+              <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                href="/"
+              >
+                <PsychologyIcon fontSize="large" sx={{ color: "#444" }} />
+              </IconButton>
               <Typography variant="h6" noWrap component="div" color="black">
                 Mon profil cognitif
               </Typography>
