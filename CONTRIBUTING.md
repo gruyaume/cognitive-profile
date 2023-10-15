@@ -1,6 +1,13 @@
 # Contributing
 
-## Getting Started
+
+##  Pre-requisites
+- [Node.js](https://nodejs.org/en/download/)
+- [Git](https://git-scm.com/downloads)
+- [Rockcraft](https://snapcraft.io/rockcraft)
+
+
+## Development
 
 ```bash
 git clone https://github.com/gruyaume/cognitive-profile.git
