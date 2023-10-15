@@ -13,8 +13,10 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import AddIcon from "@mui/icons-material/Add";
 import PsychologyIcon from "@mui/icons-material/Psychology";
+import GitHubIcon from "@mui/icons-material/GitHub";
 import ThemeRegistry from "@/components/ThemeRegistry/ThemeRegistry";
 import IconButton from "@mui/material/IconButton";
+import Container from "@mui/material/Container";
 
 export const metadata = {
   title: "Mon Profil Cognitif",
@@ -83,14 +85,42 @@ export default function RootLayout({
           <Box
             component="main"
             sx={{
+              display: "flex",
+              flexDirection: "column",
               flexGrow: 1,
+              minHeight: "calc(100vh - 64px)",
               bgcolor: "background.default",
               ml: `${DRAWER_WIDTH}px`,
               mt: ["48px", "56px", "64px"],
               p: 3,
             }}
           >
-            {children}
+            <div>{children}</div>
+            <Box sx={{ mt: "auto" }}>
+              <Divider />
+              <Box
+                component="footer"
+                sx={{
+                  py: 3,
+                  px: 2,
+                  mt: "auto",
+                }}
+              >
+                <Container maxWidth="sm">
+                  <Typography variant="body1" display="inline">
+                    Tous droits réservés.
+                  </Typography>
+                  <Link
+                    href="https://github.com/gruyaume/cognitive-profile"
+                    passHref
+                  >
+                    <IconButton>
+                      <GitHubIcon />
+                    </IconButton>
+                  </Link>
+                </Container>
+              </Box>
+            </Box>
           </Box>
         </ThemeRegistry>
       </body>
