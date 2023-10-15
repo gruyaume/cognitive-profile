@@ -11,25 +11,36 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
-import FormControl from "@mui/material/FormControl";
 
 const functionToIndicesMap: Record<string, string[]> = {
-  "Fonctionnement Intellectuel Global": ["Index 1", "Index 2"],
+  "Fonctionnement intellectuel global": ["Index 1", "Index 2"],
   "Fonctions exécutives": ["Index 3", "Index 4"],
-  Abstractions: ["Index 5"],
+  Abstraction: ["Index 5"],
   Attention: ["Index 6", "Index 7"],
-  Language: ["Index 8", "Index 9"],
+  "Langage oral": ["Index 8", "Index 9"],
+  "Vitesse de traitement": ["Index 10", "Index 11"],
+  "Fonctions visuo-spatiales": ["Index 12", "Index 13"],
+  Gnosies: ["Index 14", "Index 15"],
+  "Langage écrit": ["Index 16", "Index 17"],
+  Mémoire: ["Index 18", "Index 19"],
+  Praxies: ["Index 20", "Index 21"],
 };
 
 export default function HorizontalLinearStepper() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [selectedCognitiveFunctions, setselectedCognitiveFunctions] =
     React.useState<Record<string, boolean>>({
-      "Fonctionnement Intellectuel Global": false,
+      "Fonctionnement intellectuel global": false,
       "Fonctions exécutives": false,
-      Abstractions: false,
+      Abstraction: false,
       Attention: false,
-      Language: false,
+      "Langage oral": false,
+      "Vitesse de traitement": false,
+      "Fonctions visuo-spatiales": false,
+      Gnosies: false,
+      "Langage écrit": false,
+      Mémoire: false,
+      Praxies: false,
     });
   const [selectedIndices, setSelectedIndices] = React.useState<
     Record<string, boolean>
@@ -60,7 +71,25 @@ export default function HorizontalLinearStepper() {
       [event.target.name]: event.target.checked,
     }));
   };
-
+  const IdentificationContent = (
+    <FormGroup>
+      <Box sx={{ m: 1, display: "flex", flexWrap: "wrap" }}>
+        <TextField
+          id="outlined-required"
+          label="Numéro de dossier"
+          defaultValue="1234"
+        />
+      </Box>
+      <Box sx={{ m: 1, display: "flex", flexWrap: "wrap" }}>
+        <TextField
+          id="filled-number"
+          label="Âge"
+          type="number"
+          inputProps={{ min: 0, max: 100 }}
+        />
+      </Box>
+    </FormGroup>
+  );
   const cognitiveFunctionsContent = (
     <FormGroup>
       {Object.entries(selectedCognitiveFunctions).map(
@@ -153,6 +182,10 @@ export default function HorizontalLinearStepper() {
 
   const steps = [
     {
+      label: "Identification",
+      getContent: () => IdentificationContent,
+    },
+    {
       label: "Fonctions cognitives",
       getContent: () => cognitiveFunctionsContent,
     },
@@ -190,7 +223,6 @@ export default function HorizontalLinearStepper() {
         </React.Fragment>
       ) : (
         <React.Fragment>
-          <Typography sx={{ mt: 2, mb: 1 }}>Étape {activeStep + 1}</Typography>
           <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
             <Button
               color="inherit"
