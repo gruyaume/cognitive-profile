@@ -75,10 +75,22 @@ export default function HorizontalLinearStepper() {
     Record<string, boolean>
   >({});
 
+  const [results, setResults] = React.useState<Record<string, number>>({});
+
   const handleFunctionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setselectedCognitiveFunctions((prev) => ({
       ...prev,
       [event.target.name]: event.target.checked,
+    }));
+  };
+
+  const handleResultChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    index: string
+  ) => {
+    setResults((prev) => ({
+      ...prev,
+      [index]: Number(event.target.value),
     }));
   };
 
@@ -188,6 +200,10 @@ export default function HorizontalLinearStepper() {
                       <TextField
                         label="Percentile"
                         type="number"
+                        value={results[index] || ""}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          handleResultChange(e, index)
+                        }
                         inputProps={{ min: 0, max: 100 }}
                         variant="outlined"
                         fullWidth
@@ -243,7 +259,11 @@ export default function HorizontalLinearStepper() {
       {activeStep === steps.length ? (
         <React.Fragment>
           <Typography sx={{ mt: 2, mb: 1 }}>
-            Toutes les étapes sont complétées!
+            {Object.entries(results).map(([index, value]) => (
+              <div key={index}>
+                {index}: {value}%
+              </div>
+            ))}
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
             <Box sx={{ flex: "1 1 auto" }} />
