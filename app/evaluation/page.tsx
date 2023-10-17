@@ -201,7 +201,9 @@ export default function HorizontalLinearStepper() {
                         label="Percentile"
                         type="number"
                         value={results[index] || ""}
-                        onChange={(e) => handleResultChange(e, index)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          handleResultChange(e, index)
+                        }
                         inputProps={{ min: 0, max: 100 }}
                         variant="outlined"
                         fullWidth
