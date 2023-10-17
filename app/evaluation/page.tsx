@@ -13,17 +13,53 @@ import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 
 const functionToIndicesMap: Record<string, string[]> = {
-  "Fonctionnement intellectuel global": ["Index 1", "Index 2"],
-  "Fonctions exécutives": ["Index 3", "Index 4"],
-  Abstraction: ["Index 5"],
-  Attention: ["Index 6", "Index 7"],
-  "Langage oral": ["Index 8", "Index 9"],
-  "Vitesse de traitement": ["Index 10", "Index 11"],
-  "Fonctions visuo-spatiales": ["Index 12", "Index 13"],
-  Gnosies: ["Index 14", "Index 15"],
-  "Langage écrit": ["Index 16", "Index 17"],
-  Mémoire: ["Index 18", "Index 19"],
-  Praxies: ["Index 20", "Index 21"],
+  "Fonctionnement intellectuel global": [
+    "QI",
+    "GAI",
+    "Compréhension verbale",
+    "Raisonnement perceptif",
+    "Mémoire de travail",
+    "Vitesse de traitement",
+  ],
+  "Fonctions exécutives": [
+    "Figure de Rey Rappel Immédiat",
+    "Figure de Rey Rappel Différé",
+    "Figure de Rey Temps de Copie",
+    "Figure de Rey Reconnaissance",
+    "Stroop D-Kefs Dénomination de couleur",
+    "Stroop D-Kefs Lecture de mots",
+    "Stroop D-Kefs Inhibition",
+    "Stroop D-Kefs Inhibition/Alternance",
+    "Tour D-Kefs Score de réussite total",
+    "Tour D-Kefs Temps moyen 1er mouvement",
+    "Tour D-Kefs Ratio temps-par-mouvement",
+    "Tour D-Kefs Ratio précision de mouvement",
+    "Tour D-Kefs Ratio violation de règle par item",
+    "Trail-Making Temps trail A",
+    "Trail-Making Temps trail B",
+    "Wisconsin Nombre d’essais",
+    "Wisconsin Nombre de réponse correcte",
+    "Wisconsin Nombre d’erreurs",
+    "Wisconsin Réponses persévératives",
+    "Wisconsin Erreurs persévératives",
+    "Wisconsin Erreurs non-persévératives",
+    "Wisconsin Niveau de réponses conceptuelles",
+    "Wisconsin Nombre de catégories complétées",
+    "Wisconsin Nombre d’essais pour compléter la première catégorie",
+    "Wisconsin Échec du maintien de catégorie",
+    "Wisconsin Apprendre à apprendre",
+  ],
+
+  Attention: [
+    "CPT-3 Détectabilité",
+    "CPT-3 Omissions",
+    "CPT-3 Commissions",
+    "CPT-3 Persévérations",
+    "CPT-3 HRT",
+    "CPT-3 Variabilité",
+    "CPT-3 HRT Block change",
+    "CPT-3 HRT ISI",
+  ],
 };
 
 export default function HorizontalLinearStepper() {
@@ -32,15 +68,8 @@ export default function HorizontalLinearStepper() {
     React.useState<Record<string, boolean>>({
       "Fonctionnement intellectuel global": false,
       "Fonctions exécutives": false,
-      Abstraction: false,
+
       Attention: false,
-      "Langage oral": false,
-      "Vitesse de traitement": false,
-      "Fonctions visuo-spatiales": false,
-      Gnosies: false,
-      "Langage écrit": false,
-      Mémoire: false,
-      Praxies: false,
     });
   const [selectedIndices, setSelectedIndices] = React.useState<
     Record<string, boolean>
