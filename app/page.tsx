@@ -30,7 +30,7 @@ export default function HomePage() {
 
   return (
     <Typography sx={{ mt: 2, mb: 1 }}>
-      <CognitiveChart data={mockData} />
+      <CognitiveChart data={mockData} age={23} caseNumber={"3253"} />
     </Typography>
   );
 }

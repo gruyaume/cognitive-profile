@@ -4,20 +4,48 @@ import Annotation from "chartjs-plugin-annotation";
 import { ChartConfiguration } from "chart.js";
 
 const COLORS = [
-  "#ff6384",
-  "#ff9f40",
-  "#ffcd56",
-  "#4bc0c0",
-  "#36a2eb",
-  "#9966ff",
-  "#ff80b3",
+  "#ff6384", // red
+  "#ff9f40", // orange
+  "#ffcd56", // yellow
+  "#66cc66", // green
+  "#36a2eb", // blue
+  "#9966ff", // purple
+  "#ff80b3", // pink
 ];
-const SEPARATIONS = [0, 2, 9, 25, 75, 91, 98, 100];
+
+type FunctionMap = {
+  [functionName: string]: {
+    [indexName: string]: number;
+  };
+};
+
+const SEPARATION_POINTS = [1, 5.5, 17, 50, 83, 94.5, 99, 100];
 
 type ChartData = {
   [functionName: string]: {
     [indexName: string]: number;
   };
+};
+
+const createGradient = (
+  ctx: CanvasRenderingContext2D,
+  yScale: any
+): CanvasGradient => {
+  const gradient = ctx.createLinearGradient(
+    0,
+    yScale.getPixelForValue(0),
+    0,
+    yScale.getPixelForValue(100)
+  );
+
+  SEPARATION_POINTS.forEach((value, index, array) => {
+    if (index < array.length - 1) {
+      const position = value / 100;
+      gradient.addColorStop(position, COLORS[index]);
+    }
+  });
+
+  return gradient;
 };
 
 Chart.register(
@@ -27,23 +55,16 @@ Chart.register(
     beforeDraw: (chart, args, options) => {
       const ctx = chart.canvas.getContext("2d");
       if (!ctx) return;
-
       const yScale = chart.scales.y;
+      const gradient = createGradient(ctx, yScale);
 
-      const colors = options.colors;
-      const separations = options.separations;
-
-      for (let i = 0; i < separations.length - 1; i++) {
-        const start = yScale.getPixelForValue(separations[i]);
-        const end = yScale.getPixelForValue(separations[i + 1]);
-        ctx.fillStyle = colors[i];
-        ctx.fillRect(
-          chart.chartArea.left,
-          start,
-          chart.chartArea.width,
-          end - start
-        );
-      }
+      ctx.fillStyle = gradient;
+      ctx.fillRect(
+        chart.chartArea.left,
+        yScale.getPixelForValue(0),
+        chart.chartArea.width,
+        yScale.getPixelForValue(100) - yScale.getPixelForValue(0)
+      );
     },
   },
   {
@@ -101,14 +122,10 @@ Chart.register(
   }
 );
 
-interface ResultMapping {
-  [functionName: string]: {
-    [indexName: string]: number;
-  };
-}
-
 interface CognitiveChartProps {
-  data: ResultMapping;
+  data: FunctionMap;
+  age: number | null;
+  caseNumber: string;
 }
 
 const populateDataArrays = (data: ChartData) => {
@@ -128,7 +145,11 @@ const populateDataArrays = (data: ChartData) => {
   return { allIndices, percentiles, separatorIndices };
 };
 
-const CognitiveChart: React.FC<CognitiveChartProps> = ({ data }) => {
+const CognitiveChart: React.FC<CognitiveChartProps> = ({
+  data,
+  age,
+  caseNumber,
+}) => {
   const { allIndices, percentiles, separatorIndices } = React.useMemo(
     () => populateDataArrays(data),
     [data]
@@ -176,10 +197,18 @@ const CognitiveChart: React.FC<CognitiveChartProps> = ({ data }) => {
         },
       },
       plugins: {
-        customCanvasBackgroundColor: {
-          colors: COLORS,
-          separations: SEPARATIONS,
+        title: {
+          display: true,
+          text: age !== null ? `#${caseNumber} (${age} ans)` : `#${caseNumber}`,
+          font: {
+            size: 32,
+          },
+          padding: {
+            top: 10,
+            bottom: 20,
+          },
         },
+        customCanvasBackgroundColor: {},
         customFunctionLabelDrawing: {
           data: data,
           allIndices: allIndices,
@@ -189,17 +218,6 @@ const CognitiveChart: React.FC<CognitiveChartProps> = ({ data }) => {
         },
         legend: {
           display: false,
-        },
-        annotation: {
-          annotations: separatorIndices.map((index) => ({
-            type: "line",
-            mode: "vertical",
-            scaleID: "x",
-            value: index,
-            borderColor: "black",
-            yMin: 0,
-            yMax: "max",
-          })),
         },
       },
     },
