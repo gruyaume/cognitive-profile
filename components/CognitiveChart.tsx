@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+
 import Chart from "chart.js/auto";
 import Annotation from "chartjs-plugin-annotation";
 import { ChartConfiguration } from "chart.js";
@@ -223,15 +224,22 @@ const CognitiveChart: React.FC<CognitiveChartProps> = ({
     },
   } as ChartConfiguration;
 
-  return (
-    <canvas
-      ref={(canvas) => {
-        if (canvas) {
-          new Chart(canvas, config);
-        }
-      }}
-    />
-  );
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+  const chartRef = React.useRef<Chart | null>(null);
+
+  useEffect(() => {
+    if (canvasRef.current) {
+      chartRef.current = new Chart(canvasRef.current, config);
+    }
+
+    return () => {
+      if (chartRef.current) {
+        chartRef.current.destroy();
+      }
+    };
+  }, [config]);
+
+  return <canvas ref={canvasRef} />;
 };
 
 export default CognitiveChart;
