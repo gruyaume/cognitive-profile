@@ -65,6 +65,9 @@ const functionToIndicesMap: Record<string, string[]> = {
 
 export default function HorizontalLinearStepper() {
   const [activeStep, setActiveStep] = React.useState(0);
+  const [caseNumber, setCaseNumber] = React.useState("");
+  const [age, setAge] = React.useState<number | null>(null);
+
   const [selectedCognitiveFunctions, setselectedCognitiveFunctions] =
     React.useState<Record<string, boolean>>({
       "Fonctionnement intellectuel global": false,
@@ -119,7 +122,8 @@ export default function HorizontalLinearStepper() {
         <TextField
           id="outlined-required"
           label="Numéro de dossier"
-          defaultValue="1234"
+          value={caseNumber}
+          onChange={(e) => setCaseNumber(e.target.value)}
         />
       </Box>
       <Box sx={{ m: 1, display: "flex", flexWrap: "wrap" }}>
@@ -127,6 +131,10 @@ export default function HorizontalLinearStepper() {
           id="filled-number"
           label="Âge"
           type="number"
+          value={age === null ? "" : age}
+          onChange={(e) =>
+            setAge(e.target.value ? parseInt(e.target.value) : null)
+          }
           inputProps={{ min: 0, max: 100 }}
         />
       </Box>
@@ -276,7 +284,11 @@ export default function HorizontalLinearStepper() {
       {activeStep === steps.length ? (
         <React.Fragment>
           <Typography sx={{ mt: 2, mb: 1 }}>
-            <CognitiveChart data={prepareChartData()} />
+            <CognitiveChart
+              data={prepareChartData()}
+              caseNumber={caseNumber}
+              age={age}
+            />
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
             <Box sx={{ flex: "1 1 auto" }} />
