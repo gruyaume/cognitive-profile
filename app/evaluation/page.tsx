@@ -11,6 +11,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
+import CognitiveChart from "@/components/CognitiveChart";
 
 const functionToIndicesMap: Record<string, string[]> = {
   "Fonctionnement intellectuel global": [
@@ -244,6 +245,22 @@ export default function HorizontalLinearStepper() {
     },
   ];
 
+  const prepareChartData = (): Record<string, { [index: string]: number }> => {
+    const data: Record<string, { [index: string]: number }> = {};
+
+    for (const func in functionToIndicesMap) {
+      data[func] = {};
+
+      functionToIndicesMap[func].forEach((index) => {
+        if (selectedIndices[index]) {
+          data[func][index] = results[index] || 0;
+        }
+      });
+    }
+
+    return data;
+  };
+
   return (
     <Box sx={{ width: "100%" }}>
       <Stepper activeStep={activeStep}>
@@ -259,11 +276,7 @@ export default function HorizontalLinearStepper() {
       {activeStep === steps.length ? (
         <React.Fragment>
           <Typography sx={{ mt: 2, mb: 1 }}>
-            {Object.entries(results).map(([index, value]) => (
-              <div key={index}>
-                {index}: {value}%
-              </div>
-            ))}
+            <CognitiveChart data={prepareChartData()} />
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
             <Box sx={{ flex: "1 1 auto" }} />
