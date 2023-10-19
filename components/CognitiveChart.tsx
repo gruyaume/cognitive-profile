@@ -22,6 +22,16 @@ type FunctionMap = {
 
 const SEPARATION_POINTS = [1, 5.5, 17, 50, 83, 94.5, 99, 100];
 
+const PERCENTILE_LABELS = [
+  { from: 0, to: 2, label: "Extrêmement bas" },
+  { from: 2, to: 9, label: "Inférieur à la moyenne" },
+  { from: 9, to: 25, label: "Basse Moyenne" },
+  { from: 25, to: 75, label: "Moyenne" },
+  { from: 75, to: 91, label: "Haute Moyenne" },
+  { from: 91, to: 98, label: "Supérieur à la moyenne" },
+  { from: 98, to: 100, label: "Exceptionnellement élevé" },
+];
+
 type ChartData = {
   [functionName: string]: {
     [indexName: string]: number;
@@ -69,42 +79,22 @@ Chart.register(
     },
   },
   {
-    id: "drawVerticalLines",
-    afterDraw: (chart, args, options) => {
-      const ctx = chart.ctx;
-      const xAxis = chart.scales.x;
-      const separatorIndices = options.separatorIndices;
-
-      const yOffset = chart.chartArea.bottom + 280;
-
-      ctx.strokeStyle = "grey";
-      ctx.lineWidth = 2;
-
-      if (separatorIndices) {
-        separatorIndices.forEach((index: number) => {
-          const xPos = xAxis.getPixelForValue(index);
-          ctx.beginPath();
-          ctx.moveTo(xPos, chart.chartArea.top);
-          ctx.lineTo(xPos, yOffset);
-          ctx.stroke();
-        });
-      }
-    },
-  },
-  {
     id: "customFunctionLabelDrawing",
-    afterDraw: (chart, args, options) => {
+    beforeDatasetsDraw: (chart, args, options) => {
       const ctx = chart.ctx;
       const xAxis = chart.scales.x;
       const chartData: ChartData = options.data;
       const allIndices = options.allIndices;
       let lastSeparatorIndex = 0;
 
-      ctx.fillStyle = "grey";
+      ctx.fillStyle = "white";
       ctx.textAlign = "center";
-      ctx.font = "bold 24px Arial";
+      ctx.font = "bold 40px Arial";
+      ctx.globalAlpha = 0.5;
 
-      const yOffset = chart.chartArea.bottom + 280;
+      const yOffset =
+        chart.chartArea.top +
+        (chart.chartArea.bottom - chart.chartArea.top) / 2;
 
       for (const [functionName, functionData] of Object.entries(chartData)) {
         const functionLength = Object.keys(functionData).length;
@@ -119,6 +109,30 @@ Chart.register(
 
         lastSeparatorIndex += functionLength;
       }
+
+      ctx.globalAlpha = 1.0;
+    },
+  },
+  {
+    id: "customYLabels",
+    afterDraw: (chart) => {
+      const ctx = chart.canvas.getContext("2d");
+      if (!ctx) return;
+
+      const yScale = chart.scales.y;
+
+      ctx.fillStyle = "white";
+      ctx.globalAlpha = 0.5;
+      ctx.textAlign = "left";
+      ctx.textBaseline = "bottom";
+      ctx.font = "14px Arial";
+
+      PERCENTILE_LABELS.forEach((entry) => {
+        const yPos = yScale.getPixelForValue(entry.from);
+        ctx.fillText(entry.label, chart.chartArea.left + 5, yPos);
+      });
+
+      ctx.globalAlpha = 1.0;
     },
   }
 );
@@ -173,17 +187,39 @@ const CognitiveChart: React.FC<CognitiveChartProps> = ({
     options: {
       layout: {
         padding: {
-          bottom: 100,
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
         },
       },
       scales: {
         y: {
           min: 0,
           max: 100,
+          grid: {
+            color: function (ctx) {
+              const specificValues = [2, 9, 25, 75, 91, 98];
+              const value = ctx.tick.value;
+              if (specificValues.includes(value)) {
+                return "rgba(128,128,128,1)";
+              }
+              return "transparent";
+            },
+            drawTicks: false,
+            drawOnChartArea: true,
+          },
           ticks: {
             font: {
               size: 16,
             },
+          },
+          afterBuildTicks: function (scale) {
+            const specificValues = [2, 9, 25, 75, 91, 98];
+            scale.ticks = specificValues.map((value) => ({
+              value: value,
+              label: value.toString(),
+            }));
           },
         },
         x: {
@@ -209,6 +245,19 @@ const CognitiveChart: React.FC<CognitiveChartProps> = ({
             bottom: 20,
           },
         },
+        annotation: {
+          annotations: separatorIndices.map((index) => ({
+            type: "line",
+            mode: "vertical",
+            scaleID: "x",
+            value: index,
+            borderColor: "rgba(128,128,128,1)",
+            borderWidth: 2,
+            yMin: 0,
+            yMax: "max",
+          })),
+        },
+
         customCanvasBackgroundColor: {},
         customFunctionLabelDrawing: {
           data: data,
