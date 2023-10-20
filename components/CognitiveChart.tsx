@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 
 import Chart from "chart.js/auto";
-import Annotation from "chartjs-plugin-annotation";
 import { ChartConfiguration } from "chart.js";
 
 const COLORS = [
@@ -60,7 +59,66 @@ const createGradient = (
 };
 
 Chart.register(
-  Annotation,
+  {
+    id: "drawVerticalLinesManually",
+    beforeDatasetsDraw: (chart, args, options) => {
+      console.log("Executing drawVerticalLinesManually plugin...");
+
+      const ctx = chart.ctx;
+      const xAxis = chart.scales.x;
+      const yAxis = chart.scales.y;
+
+      const separatorIndices = options.separatorIndices;
+      const allIndices = options.allIndices;
+      console.log("All indices: ", allIndices);
+
+      ctx.strokeStyle = "rgba(128,128,128,1)";
+      ctx.lineWidth = 2;
+
+      separatorIndices.forEach((index: number) => {
+        const startLabel = allIndices[Math.floor(index)];
+        const endLabel = allIndices[Math.ceil(index)];
+
+        const startXPos = xAxis.getPixelForValue(startLabel);
+        const endXPos = xAxis.getPixelForValue(endLabel);
+        const middleXPos = (startXPos + endXPos) / 2;
+
+        console.log(
+          `Trying to draw line between ${startLabel} and ${endLabel} at position: ${middleXPos}`
+        );
+
+        ctx.beginPath();
+        ctx.moveTo(middleXPos, yAxis.getPixelForValue(0));
+        ctx.lineTo(middleXPos, yAxis.getPixelForValue(100));
+        ctx.stroke();
+      });
+    },
+  },
+  {
+    id: "customYLabels",
+    beforeDatasetsDraw: (chart, args, options) => {
+      const ctx = chart.canvas.getContext("2d");
+      if (!ctx) return;
+
+      const yScale = chart.scales.y;
+
+      ctx.fillStyle = "#333";
+      ctx.globalAlpha = 0.8;
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+      ctx.font = `${options.fontSize}px Arial`;
+
+      const xOffset = chart.chartArea.left - 25;
+
+      PERCENTILE_LABELS.forEach((entry) => {
+        const middleValue = (entry.from + entry.to) / 2;
+        const yPos = yScale.getPixelForValue(middleValue);
+        ctx.fillText(entry.label, xOffset, yPos);
+      });
+
+      ctx.globalAlpha = 1.0;
+    },
+  },
   {
     id: "customCanvasBackgroundColor",
     beforeDraw: (chart, args, options) => {
@@ -89,13 +147,16 @@ Chart.register(
 
       ctx.fillStyle = "white";
       ctx.textAlign = "center";
-      ctx.font = "bold 40px Arial";
       ctx.globalAlpha = 0.5;
 
       const yOffset =
         chart.chartArea.top +
         (chart.chartArea.bottom - chart.chartArea.top) / 2;
 
+      const fontSizeFunctionNames = options.fontSize * 2;
+      ctx.font = `bold ${fontSizeFunctionNames}px Arial`;
+
+      lastSeparatorIndex = 0;
       for (const [functionName, functionData] of Object.entries(chartData)) {
         const functionLength = Object.keys(functionData).length;
         const startingLabel = allIndices[lastSeparatorIndex];
@@ -106,31 +167,8 @@ Chart.register(
         const centerPosition = (startingPosition + endingPosition) / 2;
 
         ctx.fillText(functionName, centerPosition, yOffset);
-
         lastSeparatorIndex += functionLength;
       }
-
-      ctx.globalAlpha = 1.0;
-    },
-  },
-  {
-    id: "customYLabels",
-    afterDraw: (chart) => {
-      const ctx = chart.canvas.getContext("2d");
-      if (!ctx) return;
-
-      const yScale = chart.scales.y;
-
-      ctx.fillStyle = "white";
-      ctx.globalAlpha = 0.5;
-      ctx.textAlign = "left";
-      ctx.textBaseline = "bottom";
-      ctx.font = "14px Arial";
-
-      PERCENTILE_LABELS.forEach((entry) => {
-        const yPos = yScale.getPixelForValue(entry.from);
-        ctx.fillText(entry.label, chart.chartArea.left + 5, yPos);
-      });
 
       ctx.globalAlpha = 1.0;
     },
@@ -169,6 +207,7 @@ const CognitiveChart: React.FC<CognitiveChartProps> = ({
     () => populateDataArrays(data),
     [data]
   );
+  const [fontSize, setFontSize] = React.useState(16); // default value
 
   const config = {
     type: "line",
@@ -187,7 +226,7 @@ const CognitiveChart: React.FC<CognitiveChartProps> = ({
     options: {
       layout: {
         padding: {
-          left: 0,
+          left: 200,
           right: 0,
           top: 0,
           bottom: 0,
@@ -226,10 +265,13 @@ const CognitiveChart: React.FC<CognitiveChartProps> = ({
           ticks: {
             autoSkip: false,
             maxRotation: 90,
-            minRotation: 90,
+            minRotation: 50,
             font: {
-              size: 16,
+              size: fontSize,
             },
+          },
+          grid: {
+            drawOnChartArea: false,
           },
         },
       },
@@ -245,23 +287,18 @@ const CognitiveChart: React.FC<CognitiveChartProps> = ({
             bottom: 20,
           },
         },
-        annotation: {
-          annotations: separatorIndices.map((index) => ({
-            type: "line",
-            mode: "vertical",
-            scaleID: "x",
-            value: index,
-            borderColor: "rgba(128,128,128,1)",
-            borderWidth: 2,
-            yMin: 0,
-            yMax: "max",
-          })),
+        drawVerticalLinesManually: {
+          separatorIndices: separatorIndices,
+          allIndices: allIndices,
         },
-
         customCanvasBackgroundColor: {},
         customFunctionLabelDrawing: {
           data: data,
           allIndices: allIndices,
+          fontSize: fontSize,
+        },
+        customYLabels: {
+          fontSize: fontSize,
         },
         drawVerticalLines: {
           separatorIndices: separatorIndices,
@@ -286,7 +323,21 @@ const CognitiveChart: React.FC<CognitiveChartProps> = ({
         chartRef.current.destroy();
       }
     };
-  }, [config]);
+  }, [config, fontSize]);
+
+  useEffect(() => {
+    const updateFontSize = () => {
+      const width = window.innerWidth;
+      let newSize = 16;
+      if (width <= 480) newSize = 10;
+      else if (width <= 768) newSize = 12;
+      else if (width <= 1200) newSize = 14;
+      setFontSize(newSize);
+    };
+    updateFontSize();
+    window.addEventListener("resize", updateFontSize);
+    return () => window.removeEventListener("resize", updateFontSize);
+  }, []);
 
   return <canvas ref={canvasRef} />;
 };
