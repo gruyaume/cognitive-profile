@@ -14,6 +14,7 @@ interface CognitiveResultsStepProps {
     event: React.ChangeEvent<HTMLInputElement>,
     index: string
   ) => void;
+  hasAttemptedNext: boolean;
 }
 
 const CognitiveResultsStep: React.FC<CognitiveResultsStepProps> = ({
@@ -21,6 +22,7 @@ const CognitiveResultsStep: React.FC<CognitiveResultsStepProps> = ({
   selectedIndices,
   results,
   handleResultChange,
+  hasAttemptedNext,
 }) => (
   <div>
     {Object.entries(selectedCognitiveFunctions)
@@ -39,9 +41,10 @@ const CognitiveResultsStep: React.FC<CognitiveResultsStepProps> = ({
                       {index}
                     </Typography>
                     <TextField
+                      error={hasAttemptedNext && !results[index]}
                       label="Percentile"
                       type="number"
-                      value={results[index] || ""}
+                      value={results[index] || null}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         handleResultChange(e, index)
                       }
