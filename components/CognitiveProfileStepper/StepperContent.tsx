@@ -58,6 +58,14 @@ export default function CognitiveProfileStepper() {
           }
         }
         break;
+      case 3:
+        for (let index in selectedIndices) {
+          if (selectedIndices[index] && !results[index]) {
+            setHasAttemptedNext(true);
+            return false;
+          }
+        }
+        break;
       default:
         return true;
     }
@@ -95,6 +103,12 @@ export default function CognitiveProfileStepper() {
 
   const handleReset = () => {
     setActiveStep(0);
+    setCaseNumber("");
+    setAge(null);
+    setselectedCognitiveFunctions(initialSelectedCognitiveFunctions);
+    setHasAttemptedNext(false);
+    setSelectedIndices({});
+    setResults({});
   };
 
   const handleIndexChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,6 +160,17 @@ export default function CognitiveProfileStepper() {
             selectedIndices={selectedIndices}
             results={results}
             handleResultChange={handleResultChange}
+            hasAttemptedNext={hasAttemptedNext}
+          />
+        ),
+      },
+      {
+        label: "Profil Cognitif",
+        getContent: () => (
+          <CognitiveChart
+            data={prepareChartData()}
+            caseNumber={caseNumber}
+            age={age}
           />
         ),
       },
@@ -185,41 +210,23 @@ export default function CognitiveProfileStepper() {
           </Step>
         ))}
       </Stepper>
-      {activeStep < steps.length && (
-        <Typography sx={{ mt: 2 }}>{steps[activeStep].getContent()}</Typography>
-      )}
-      {activeStep === steps.length ? (
-        <>
-          <Typography sx={{ mt: 2, mb: 1 }}>
-            <CognitiveChart
-              data={prepareChartData()}
-              caseNumber={caseNumber}
-              age={age}
-            />
-          </Typography>
-          <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-            <Box sx={{ flex: "1 1 auto" }} />
-            <Button onClick={handleReset}>Recommencer</Button>
-          </Box>
-        </>
-      ) : (
-        <>
-          <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-            <Button
-              color="inherit"
-              disabled={activeStep === 0}
-              onClick={handleBack}
-              sx={{ mr: 1 }}
-            >
-              Retour
-            </Button>
-            <Box sx={{ flex: "1 1 auto" }} />
-            <Button onClick={handleNext}>
-              {activeStep === steps.length - 1 ? "Terminer" : "Suivant"}
-            </Button>
-          </Box>
-        </>
-      )}
+      <Typography sx={{ mt: 2 }}>{steps[activeStep].getContent()}</Typography>
+      <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+        <Button
+          color="inherit"
+          disabled={activeStep === 0}
+          onClick={handleBack}
+          sx={{ mr: 1 }}
+        >
+          Retour
+        </Button>
+        <Box sx={{ flex: "1 1 auto" }} />
+        {activeStep === steps.length - 1 ? (
+          <Button onClick={handleReset}>Recommencer</Button>
+        ) : (
+          <Button onClick={handleNext}>Suivant</Button>
+        )}
+      </Box>
     </Box>
   );
 }
