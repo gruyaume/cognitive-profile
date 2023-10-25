@@ -16,6 +16,10 @@ jobs:
     needs: build
     uses: ./.github/workflows/build-image.yaml
 
+  scan:
+    needs: build-image
+    uses: ./.github/workflows/scan-rock.yaml
+
   integration-tests:
     needs: build-image
     uses: ./.github/workflows/integration-tests.yaml
