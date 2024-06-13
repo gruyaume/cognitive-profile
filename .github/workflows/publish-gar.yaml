@@ -34,13 +34,17 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: rock
-
+      
+      - name: Install rockcraft
+        run: |
+          sudo snap install rockcraft --classic --channel=edge
+  
       - name: Import and push to github package
         run: |
           image_name="$(yq '.name' rockcraft.yaml)"
           version="$(yq '.version' rockcraft.yaml)"
           rock_file=$(ls *.rock | tail -n 1)
-          sudo skopeo \
+          sudo rockcraft.skopeo \
             --insecure-policy \
             copy \
             oci-archive:"${rock_file}" \

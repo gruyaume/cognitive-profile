@@ -8,11 +8,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        uses: actions/checkout@v4
 
-      - name: Install Skopeo
+      - name: Install rockcraft
         run: |
-          sudo snap install skopeo --edge --devmode
+          sudo snap install rockcraft --classic --channel=edge
 
       - uses: actions/download-artifact@v4
         with:
@@ -23,7 +23,7 @@ jobs:
           image_name="$(yq '.name' rockcraft.yaml)"
           version="$(yq '.version' rockcraft.yaml)"
           rock_file=$(ls *.rock | tail -n 1)
-          sudo skopeo \
+          sudo rockcraft.skopeo \
             --insecure-policy \
             copy \
             oci-archive:"${rock_file}" \
